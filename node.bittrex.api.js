@@ -222,11 +222,14 @@ var NodeBittrexApi = function () {
                         ) {
                             ((opts.verbose) ? console.log('Websocket auto reconnecting.') : '');
                             try {
+                                wsclient.serviceHandlers.disconnected = null;
                                 wsclient.close();
                             }
                             catch (e) {
                             }
-                            connectws(undefined, true);
+                            connectws(function () {
+                                setMessageReceivedWs();
+                            }, true);
                         }
                     },
                     onerror: function (error) {
