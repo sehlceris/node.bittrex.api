@@ -168,14 +168,31 @@ var NodeBittrexApi = function () {
     var websocketMarketsCallback;
 
     var connectws = function (callback, force) {
+        if (opts.verbose) {
+            console.log('connectws: wsclient=' + !!wsclient + ' force=' + !!force);
+        }
         if (wsclient && !force && callback) {
             return callback(wsclient);
         }
-        if (force) {
+        if (force && !!wsclient) {
             try {
+                wsclient.serviceHandlers = {
+                    connectFailed: null,
+                    disconnected: null,
+                    onerror: null,
+                    bindingError: null,
+                    connectionLost: null,
+                };
                 wsclient.end();
+                if (opts.verbose) {
+                    console.log('bittrex aborted wsclient');
+                }
             } catch (e) {
+                if (opts.verbose) {
+                    console.log('bittrex failed to abort ws client: ' + e);
+                }
             }
+            wsclient = null;
         }
         cloudscraper.get('https://bittrex.com/', function (error, response, body) {
             if (error) {
