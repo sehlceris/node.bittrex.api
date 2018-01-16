@@ -114,10 +114,10 @@ var NodeBittrexApi = function () {
         return uri;
     };
 
-    var sendRequestCallback = function (callback, op) {
+    var sendRequestCallback = function (callback, op, post) {
         var start = Date.now();
+        var requestCallbackFunction = function (error, result, body) {
 
-        request(op, function (error, result, body) {
             ((opts.verbose) ? console.log("requested from " + op.uri + " in: %ds", (Date.now() - start) / 1000) : '');
             if (!body || !result || result.statusCode != 200) {
                 var errorObj = {
@@ -144,7 +144,15 @@ var NodeBittrexApi = function () {
                     callback(null, ((opts.cleartext) ? body : result)) :
                     callback(((opts.cleartext) ? body : result), null));
             }
-        });
+        };
+        if (post === true) {
+            ((opts.verbose) ? console.log("POST") : '');
+            request.post(op, requestCallbackFunction);
+        }
+        else {
+            ((opts.verbose) ? console.log("GET") : '');
+            request(op, requestCallbackFunction);
+        }
     };
 
     var publicApiCall = function (url, callback, options) {
@@ -155,11 +163,11 @@ var NodeBittrexApi = function () {
         sendRequestCallback(callback, (!options) ? op : setRequestUriGetParams(url, options));
     };
 
-    var credentialApiCall = function (url, callback, options) {
+    var credentialApiCall = function (url, callback, options, post) {
         if (options) {
             options = setRequestUriGetParams(apiCredentials(url), options);
         }
-        sendRequestCallback(callback, options);
+        sendRequestCallback(callback, options, post);
     };
 
     var websocketGlobalTickers = false;
@@ -412,6 +420,9 @@ var NodeBittrexApi = function () {
         },
         getbalances: function (callback) {
             credentialApiCall(opts.baseUrl + '/account/getbalances', callback, {});
+        },
+        getbalancesv2: function (callback) {
+            credentialApiCall(opts.baseUrlv2 + '/key/balance/GetBalances', callback, {}, true);
         },
         getbalance: function (options, callback) {
             credentialApiCall(opts.baseUrl + '/account/getbalance', callback, options);
