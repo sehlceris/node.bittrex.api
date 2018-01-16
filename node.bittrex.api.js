@@ -164,6 +164,12 @@ var NodeBittrexApi = function () {
     };
 
     var credentialApiCall = function (url, callback, options, post) {
+        if (typeof options !== 'object') {
+            throw new Error('options not specified for credential API call - at least use an empty object!');
+        }
+        if (typeof callback !== 'function') {
+            throw new Error('callback not specified for credential API call');
+        }
         if (options) {
             options = setRequestUriGetParams(apiCredentials(url), options);
         }
@@ -432,6 +438,9 @@ var NodeBittrexApi = function () {
         },
         getdepositaddress: function (options, callback) {
             credentialApiCall(opts.baseUrl + '/account/getdepositaddress', callback, options);
+        },
+        getdepositaddressv2: function (options, callback) {
+            credentialApiCall(opts.baseUrlv2 + '/key/balance/GetDepositAddress', callback, options, true);
         },
         getdeposithistory: function (options, callback) {
             credentialApiCall(opts.baseUrl + '/account/getdeposithistory', callback, options);
