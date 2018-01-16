@@ -165,10 +165,14 @@ var NodeBittrexApi = function () {
 
     var credentialApiCall = function (url, callback, options, post) {
         if (typeof options !== 'object') {
-            throw new Error('options not specified for credential API call - at least use an empty object!');
+            var errorMessage = 'error: options not specified for credential API call - at least use an empty object!';
+            ((opts.verbose) ? console.log(errorMessage) : '');
+            throw new Error(errorMessage);
         }
         if (typeof callback !== 'function') {
-            throw new Error('callback not specified for credential API call');
+            var errorMessage = 'error: callback not specified for credential API call';
+            ((opts.verbose) ? console.log(errorMessage) : '');
+            throw new Error(errorMessage);
         }
         if (options) {
             options = setRequestUriGetParams(apiCredentials(url), options);
